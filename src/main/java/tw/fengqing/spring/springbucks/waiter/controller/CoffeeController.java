@@ -27,7 +27,7 @@ public class CoffeeController {
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Coffee getById(@PathVariable Long id) {
         Coffee coffee = coffeeService.getCoffee(id);

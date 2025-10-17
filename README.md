@@ -1,264 +1,1034 @@
-# Spring Boot 微服務架構實戰 - 咖啡訂單服務 ⚡
+# complex-controller-demo
 
-[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
+> Spring MVC controller methods with @RequestMapping, @PathVariable, @RequestParam, and @RequestBody
+
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.5-brightgreen.svg)](https://spring.io/projects/spring-boot)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.org/)
+[![Spring MVC](https://img.shields.io/badge/Spring%20MVC-6.2.5-blue.svg)](https://spring.io/projects/spring-framework)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## 專案介紹
+A comprehensive demonstration of **Spring MVC controller methods** featuring `@RequestMapping` attributes, HTTP method shortcuts (`@GetMapping`, `@PostMapping`), parameter handling (`@PathVariable`, `@RequestParam`, `@RequestBody`), and response configuration.
 
-這是一個基於 Spring Boot 3.x 的微服務架構實戰專案，主要展示咖啡訂單管理系統的後端 API 實作。專案採用現代化的 Jakarta EE 標準，結合 JPA、Lombok 等技術，提供完整的 RESTful API 服務。
+## Features
 
-### 🎯 專案特色
+- `@Controller` vs `@RestController`
+- `@RequestMapping` with multiple attributes (path, method, params, headers, consumes, produces)
+- HTTP method shortcuts (`@GetMapping`, `@PostMapping`, `@PutMapping`, `@DeleteMapping`)
+- `@PathVariable` for URL path variables
+- `@RequestParam` for query parameters
+- `@RequestBody` for JSON request body
+- `@ResponseBody` for JSON response
+- `@ResponseStatus` for HTTP status codes
+- `params` condition matching (params vs no params)
+- `consumes` and `produces` for media type control
+- RESTful API design demonstration
+- H2 database integration
 
-- **現代化技術棧**：採用 Spring Boot 3.4.5 + Java 21 + Jakarta EE
-- **完整的 CRUD 操作**：提供咖啡訂單的建立、查詢、狀態更新等功能
-- **資料持久化**：使用 JPA + H2 資料庫，支援自動建表
-- **RESTful API 設計**：遵循 REST 規範，提供標準化的 HTTP 介面
-- **貨幣處理**：整合 Joda Money 處理價格計算，支援多幣別
-- **程式碼品質**：使用 Lombok 減少樣板程式碼，提升開發效率
+## Tech Stack
 
-> 💡 **為什麼選擇此專案？**
-> - 展示 Spring Boot 3.x 的最新特性與最佳實踐
-> - 提供完整的微服務架構實作範例
-> - 結合實務需求，適合學習與參考
+- Spring Boot 3.4.5
+- Spring MVC 6.2.5
+- Spring Data JPA
+- Java 21
+- H2 Database 2.3.232
+- Joda Money 2.0.2
+- Lombok
+- Maven 3.8+
 
-## 技術棧
+## Getting Started
 
-### 核心框架
-- **Spring Boot 3.4.5** - 現代化的 Java 應用程式框架
-- **Spring MVC** - Web 層處理，提供 RESTful API
-- **Spring Data JPA** - 資料存取層，簡化資料庫操作
-- **Jakarta EE** - 企業級 Java 標準，取代舊版 javax
+### Prerequisites
 
-### 開發工具與輔助
-- **Lombok** - 自動生成 getter/setter、builder 等樣板程式碼
-- **Joda Money** - 貨幣處理庫，支援精確的價格計算
-- **H2 Database** - 內嵌式資料庫，適合開發與測試
-- **Maven** - 專案建構與依賴管理工具
+- JDK 21 or higher
+- Maven 3.8+ (or use included Maven Wrapper)
 
-## 專案結構
+### Quick Start
 
-```
-complex-controller-demo/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── tw/fengqing/spring/springbucks/waiter/
-│   │   │       ├── WaiterServiceApplication.java     # 應用程式啟動類別
-│   │   │       ├── controller/                       # 控制器層
-│   │   │       │   ├── CoffeeController.java        # 咖啡管理 API
-│   │   │       │   ├── CoffeeOrderController.java   # 訂單管理 API
-│   │   │       │   └── request/                     # 請求物件
-│   │   │       │       └── NewOrderRequest.java     # 新訂單請求
-│   │   │       ├── model/                           # 實體模型層
-│   │   │       │   ├── BaseEntity.java              # 基礎實體類別
-│   │   │       │   ├── Coffee.java                  # 咖啡實體
-│   │   │       │   ├── CoffeeOrder.java             # 訂單實體
-│   │   │       │   ├── OrderState.java              # 訂單狀態列舉
-│   │   │       │   └── MoneyConverter.java          # 貨幣轉換器
-│   │   │       ├── repository/                      # 資料存取層
-│   │   │       │   ├── CoffeeRepository.java        # 咖啡資料存取
-│   │   │       │   └── CoffeeOrderRepository.java   # 訂單資料存取
-│   │   │       └── service/                         # 業務邏輯層
-│   │   │           ├── CoffeeService.java           # 咖啡業務邏輯
-│   │   │           └── CoffeeOrderService.java      # 訂單業務邏輯
-│   │   └── resources/
-│   │       ├── application.properties               # 應用程式設定檔
-│   │       ├── data.sql                             # 初始資料
-│   │       └── schema.sql                           # 資料庫結構
-│   └── test/                                        # 測試程式碼
-├── pom.xml                                          # Maven 專案設定
-└── README.md                                        # 專案說明文件
-```
+**Run the application:**
 
-## 快速開始
-
-### 前置需求
-- **Java 21** - 確保已安裝 JDK 21 或以上版本
-- **Maven 3.6+** - 專案建構工具
-- **IDE 支援** - 建議使用 IntelliJ IDEA 或 Eclipse
-
-### 安裝與執行
-
-1. **克隆此倉庫：**
 ```bash
-git clone https://github.com/SpringMicroservicesCourse/spring-microservices-practice.git
+./mvnw spring-boot:run
 ```
 
-2. **進入專案目錄：**
+**Test the API:**
+
 ```bash
-cd complex-controller-demo
+# Get all coffees
+curl http://localhost:8080/coffee/
+
+# Get coffee by ID
+curl http://localhost:8080/coffee/1
+
+# Get coffee by name
+curl "http://localhost:8080/coffee/?name=mocha"
 ```
 
-3. **編譯專案：**
+## Configuration
+
+### Application Properties
+
+```properties
+# JPA/Hibernate configuration
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.properties.hibernate.show_sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# Error response configuration (for development only)
+server.error.include-message=always
+server.error.include-binding-errors=always
+```
+
+**Important:**
+- `show_sql=true`: Show SQL statements (development only)
+- `include-message=always`: Include error messages in response (development only)
+
+## API Documentation
+
+### Coffee API
+
+#### 1. Get All Coffees
+
 ```bash
-mvn clean compile
+curl -X GET http://localhost:8080/coffee/
 ```
 
-4. **執行應用程式：**
+**Endpoint:** `GET /coffee/`  
+**Condition:** No `name` parameter (`params = "!name"`)  
+**Response:** List of all coffees
+
+**Sample Response:**
+
+```json
+[
+  {
+    "id": 1,
+    "name": "espresso",
+    "price": "TWD 100.00",
+    "createTime": "2025-10-16T16:52:02",
+    "updateTime": "2025-10-16T16:52:02"
+  },
+  {
+    "id": 2,
+    "name": "latte",
+    "price": "TWD 125.00",
+    "createTime": "2025-10-16T16:52:02",
+    "updateTime": "2025-10-16T16:52:02"
+  }
+]
+```
+
+#### 2. Get Coffee by ID
+
 ```bash
-mvn spring-boot:run
+curl -X GET http://localhost:8080/coffee/1
 ```
 
-5. **驗證服務啟動：**
+**Endpoint:** `GET /coffee/{id}`  
+**Path Variable:** `id` (Long)  
+**Produces:** `application/json`
+
+**Sample Response:**
+
+```json
+{
+  "id": 1,
+  "name": "espresso",
+  "price": "TWD 100.00",
+  "createTime": "2025-10-16T16:52:02",
+  "updateTime": "2025-10-16T16:52:02"
+}
+```
+
+#### 3. Get Coffee by Name
+
 ```bash
-curl http://localhost:8080/order/1
+curl -X GET "http://localhost:8080/coffee/?name=mocha"
 ```
 
-## API 使用說明
+**Endpoint:** `GET /coffee/`  
+**Condition:** Has `name` parameter (`params = "name"`)  
+**Query Parameter:** `name` (String)
 
-### 建立新訂單
+**Sample Response:**
+
+```json
+{
+  "id": 4,
+  "name": "mocha",
+  "price": "TWD 150.00",
+  "createTime": "2025-10-16T16:52:02",
+  "updateTime": "2025-10-16T16:52:02"
+}
+```
+
+### Order API
+
+#### 1. Get Order by ID
+
+```bash
+curl -X GET http://localhost:8080/order/1
+```
+
+**Endpoint:** `GET /order/{id}`  
+**Path Variable:** `id` (Long)
+
+**Sample Response:**
+
+```json
+{
+  "id": 1,
+  "customer": "Ray Chu",
+  "items": [
+    {
+      "id": 4,
+      "name": "mocha",
+      "price": "TWD 150.00",
+      "createTime": "2025-10-16T16:52:02",
+      "updateTime": "2025-10-16T16:52:02"
+    }
+  ],
+  "state": "INIT",
+  "createTime": "2025-10-16T16:52:02",
+  "updateTime": "2025-10-16T16:52:02"
+}
+```
+
+#### 2. Create New Order
+
 ```bash
 curl -X POST http://localhost:8080/order/ \
   -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
   -d '{
-    "customer": "Li Lei",
+    "customer": "Ray Chu",
     "items": ["mocha", "latte"]
   }'
 ```
 
-### 查詢訂單
-```bash
-curl http://localhost:8080/order/1
-```
+**Endpoint:** `POST /order/`  
+**Consumes:** `application/json` (required)  
+**Produces:** `application/json` (required)  
+**Request Body:** `NewOrderRequest` object  
+**Response Status:** `201 CREATED`
 
-### 查詢咖啡列表
-```bash
-curl http://localhost:8080/coffee/
-```
+**Sample Response:**
 
-## 進階說明
-
-### 環境變數
-```properties
-# 資料庫設定
-spring.datasource.url=jdbc:h2:mem:testdb
-spring.datasource.driverClassName=org.h2.Driver
-
-# JPA 設定
-spring.jpa.hibernate.ddl-auto=create-drop
-spring.jpa.show-sql=true
-
-# 應用程式設定
-server.port=8080
-logging.level.tw.fengqing=DEBUG
-```
-
-### 重要程式碼說明
-
-#### 貨幣轉換器 (MoneyConverter.java)
-```java
-/**
- * JPA 屬性轉換器
- * 用於在資料庫和 Java 物件之間轉換 Money 類型
- * 將金額轉換為最小貨幣單位（分）進行儲存
- */
-@Converter(autoApply = true)
-public class MoneyConverter implements AttributeConverter<Money, Long> {
-    // 實作轉換邏輯
+```json
+{
+  "id": 2,
+  "customer": "Ray Chu",
+  "items": [
+    {
+      "id": 4,
+      "name": "mocha",
+      "price": "TWD 150.00",
+      "createTime": "2025-10-16T16:52:02",
+      "updateTime": "2025-10-16T16:52:02"
+    },
+    {
+      "id": 2,
+      "name": "latte",
+      "price": "TWD 125.00",
+      "createTime": "2025-10-16T16:52:02",
+      "updateTime": "2025-10-16T16:52:02"
+    }
+  ],
+  "state": "INIT",
+  "createTime": "2025-10-16T16:52:05",
+  "updateTime": "2025-10-16T16:52:05"
 }
 ```
 
-#### 訂單控制器 (CoffeeOrderController.java)
+## Key Components
+
+### CoffeeController
+
 ```java
-/**
- * 訂單管理控制器
- * 提供訂單的建立、查詢等 RESTful API
- * 支援 JSON 格式的請求與回應
- */
+@Controller
+@RequestMapping("/coffee")
+public class CoffeeController {
+    
+    @Autowired
+    private CoffeeService coffeeService;
+    
+    /**
+     * Get all coffees
+     * Condition: When NO name parameter exists
+     * params = "!name" means "name parameter must not exist"
+     */
+    @GetMapping(path = "/", params = "!name")
+    @ResponseBody
+    public List<Coffee> getAll() {
+        return coffeeService.getAllCoffee();
+    }
+    
+    /**
+     * Get coffee by ID
+     * @PathVariable: Extract id from URL path
+     * produces: Only produce application/json response
+     */
+    @RequestMapping(path = "/{id}", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Coffee getById(@PathVariable Long id) {
+        Coffee coffee = coffeeService.getCoffee(id);
+        return coffee;
+    }
+    
+    /**
+     * Get coffee by name
+     * Condition: When name parameter exists
+     * params = "name" means "name parameter must exist"
+     * @RequestParam: Extract name from query parameter
+     */
+    @GetMapping(path = "/", params = "name")
+    @ResponseBody
+    public Coffee getByName(@RequestParam String name) {
+        return coffeeService.getCoffee(name);
+    }
+}
+```
+
+**Annotation Explanation:**
+
+- **@Controller**: Mark class as MVC controller
+- **@RequestMapping("/coffee")**: Base path for all methods
+- **@ResponseBody**: Convert return value to HTTP response body
+- **params = "!name"**: Match when `name` parameter does NOT exist
+- **params = "name"**: Match when `name` parameter EXISTS
+- **@PathVariable**: Extract variable from URL path
+- **@RequestParam**: Extract value from query parameter
+
+**URL Routing:**
+- `GET /coffee/` → `getAll()` (no name param)
+- `GET /coffee/?name=mocha` → `getByName()` (has name param)
+- `GET /coffee/1` → `getById()` (path variable)
+
+### CoffeeOrderController
+
+```java
 @RestController
 @RequestMapping("/order")
 @Slf4j
 public class CoffeeOrderController {
-    // 控制器實作
+    
+    @Autowired
+    private CoffeeOrderService orderService;
+    
+    @Autowired
+    private CoffeeService coffeeService;
+    
+    /**
+     * Get order by ID
+     * @RestController automatically includes @ResponseBody
+     */
+    @GetMapping("/{id}")
+    public CoffeeOrder getOrder(@PathVariable("id") Long id) {
+        return orderService.get(id);
+    }
+    
+    /**
+     * Create new order
+     * consumes: Only accept application/json
+     * produces: Only produce application/json
+     * @RequestBody: Extract JSON from request body
+     * @ResponseStatus: Set response status to 201 CREATED
+     */
+    @PostMapping(path = "/", 
+                 consumes = MediaType.APPLICATION_JSON_VALUE,
+                 produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public CoffeeOrder create(@RequestBody NewOrderRequest newOrder) {
+        log.info("Receive new Order {}", newOrder);
+        Coffee[] coffeeList = coffeeService.getCoffeeByName(newOrder.getItems())
+                .toArray(new Coffee[] {});
+        return orderService.createOrder(newOrder.getCustomer(), coffeeList);
+    }
 }
 ```
 
-## 錯誤處理說明
+**Annotation Explanation:**
 
-### HTTP 狀態碼對應
+- **@RestController**: `@Controller` + `@ResponseBody` combined
+- **consumes = APPLICATION_JSON_VALUE**: Only accept JSON requests
+- **produces = APPLICATION_JSON_VALUE**: Only produce JSON responses
+- **@RequestBody**: Auto-convert JSON to Java object
+- **@ResponseStatus(CREATED)**: Set HTTP status to 201
 
-| 狀態碼 | 說明 | 常見原因 |
-|--------|------|----------|
-| 200 | 成功 | 正常查詢操作 |
-| 201 | 建立成功 | 新訂單建立成功 |
-| 400 | 請求錯誤 | 請求體格式錯誤或缺少必要參數 |
-| 406 | 不接受 | Accept 頭部與伺服器回應格式不匹配 |
-| 415 | 不支援的媒體類型 | Content-Type 不是 application/json |
+### NewOrderRequest
 
-### 常見錯誤處理
-
-**415 錯誤**：當 Content-Type 不是 `application/json` 時
-```bash
-curl -X POST http://localhost:8080/order/ \
-  -H "Content-Type: text/plain" \
-  -d "test"
+```java
+@Getter
+@Setter
+@ToString
+public class NewOrderRequest {
+    private String customer;        // Customer name
+    private List<String> items;     // List of coffee names
+}
 ```
 
-**400 錯誤**：當請求體為空時
-```bash
-curl -X POST http://localhost:8080/order/ \
-  -H "Content-Type: application/json"
+**Sample JSON:**
+
+```json
+{
+  "customer": "Ray Chu",
+  "items": ["mocha", "latte"]
+}
 ```
 
-**406 錯誤**：當 Accept 頭部不匹配時
+## Spring MVC Annotations
+
+### @RequestMapping Attributes
+
+```java
+@RequestMapping(
+    path = "/coffee",              // URL path
+    method = RequestMethod.GET,    // HTTP method
+    params = "name",               // Parameter condition
+    headers = "X-Custom-Header",   // Header condition
+    consumes = "application/json", // Accept Content-Type
+    produces = "application/json"  // Response Content-Type
+)
+```
+
+### HTTP Method Shortcuts
+
+```java
+// Equivalent shortcuts
+@GetMapping("/coffee")           // GET
+@PostMapping("/order")           // POST
+@PutMapping("/order/{id}")       // PUT
+@DeleteMapping("/order/{id}")    // DELETE
+@PatchMapping("/order/{id}")     // PATCH
+
+// Instead of verbose @RequestMapping
+@RequestMapping(path = "/coffee", method = RequestMethod.GET)
+```
+
+### Parameter Annotations
+
+```java
+// @PathVariable: From URL path
+@GetMapping("/coffee/{id}")
+public Coffee get(@PathVariable Long id) { }
+
+// @RequestParam: From query string
+@GetMapping("/coffee")
+public Coffee get(@RequestParam String name) { }
+
+// @RequestBody: From request body
+@PostMapping("/order")
+public Order create(@RequestBody NewOrderRequest request) { }
+
+// @RequestHeader: From HTTP headers
+@GetMapping("/coffee")
+public Coffee get(@RequestHeader("User-Agent") String userAgent) { }
+```
+
+### Response Annotations
+
+```java
+// @ResponseBody: Convert to HTTP response
+@ResponseBody
+public Coffee get() { }
+
+// @ResponseStatus: Set HTTP status code
+@ResponseStatus(HttpStatus.CREATED)
+public Order create() { }
+
+// @RestController: Auto @ResponseBody for all methods
+@RestController
+public class OrderController { }
+```
+
+## Params Condition Matching
+
+### How It Works
+
+```java
+// Method 1: Match when NO name parameter
+@GetMapping(path = "/", params = "!name")
+public List<Coffee> getAll() { }
+
+// Method 2: Match when name parameter EXISTS
+@GetMapping(path = "/", params = "name")
+public Coffee getByName(@RequestParam String name) { }
+```
+
+**URL Routing:**
+
+| URL | Matched Method | Explanation |
+|-----|----------------|-------------|
+| `GET /coffee/` | `getAll()` | No `name` param → matches `params = "!name"` |
+| `GET /coffee/?name=mocha` | `getByName()` | Has `name` param → matches `params = "name"` |
+| `GET /coffee/1` | `getById()` | Path variable → different mapping |
+
+**Advanced Params:**
+
+```java
+// Multiple conditions
+@GetMapping(params = {"name", "size"})  // Both must exist
+
+// Value matching
+@GetMapping(params = "name=mocha")  // name must equal "mocha"
+
+// Negation
+@GetMapping(params = "!debug")  // debug param must not exist
+```
+
+## Media Type Control
+
+### consumes (Request Content-Type)
+
+```java
+@PostMapping(path = "/order/", 
+             consumes = MediaType.APPLICATION_JSON_VALUE)
+public Order create(@RequestBody NewOrderRequest request) { }
+```
+
+**Test:**
+
 ```bash
+# ✅ Correct: Content-Type is application/json
 curl -X POST http://localhost:8080/order/ \
   -H "Content-Type: application/json" \
-  -H "Accept: text/plain" \
-  -d '{"customer": "test", "items": ["latte"]}'
+  -d '{"customer": "Ray", "items": ["mocha"]}'
+
+# ❌ Wrong: Content-Type is application/pdf
+curl -X POST http://localhost:8080/order/ \
+  -H "Content-Type: application/pdf" \
+  -d '{"customer": "Ray", "items": ["mocha"]}'
+
+# Error: 415 Unsupported Media Type
 ```
 
-## 參考資源
+### produces (Response Content-Type)
 
-- [Spring Boot 官方文件](https://spring.io/projects/spring-boot)
-- [Spring Data JPA 參考手冊](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/)
-- [Jakarta EE 官方網站](https://jakarta.ee/)
-- [Lombok 專案頁面](https://projectlombok.org/)
+```java
+@GetMapping(path = "/{id}", 
+            produces = MediaType.APPLICATION_JSON_VALUE)
+public Coffee getById(@PathVariable Long id) { }
+```
 
-## 注意事項與最佳實踐
+**Test:**
 
-### ⚠️ 重要提醒
+```bash
+# ✅ Correct: Accept is application/json (or not specified)
+curl -H "Accept: application/json" http://localhost:8080/coffee/1
 
-| 項目 | 說明 | 建議做法 |
-|------|------|----------|
-| 資料庫連線 | 生產環境資料庫設定 | 使用外部資料庫，避免使用 H2 |
-| 安全性 | API 認證與授權 | 實作 Spring Security |
-| 效能 | 資料庫查詢最佳化 | 使用適當的索引與查詢策略 |
-| 日誌記錄 | 應用程式監控 | 設定適當的日誌級別 |
+# ❌ Wrong: Accept is application/xml (not supported)
+curl -H "Accept: application/xml" http://localhost:8080/coffee/1
 
-### 🔒 最佳實踐指南
+# Error: 406 Not Acceptable
+```
 
-- **程式碼註解**：在重要的程式碼區塊添加清楚註解，方便團隊成員理解與維護
-- **錯誤處理**：實作統一的錯誤處理機制，提供友善的錯誤訊息
-- **API 文件**：使用 Swagger 或 OpenAPI 生成 API 文件
-- **單元測試**：為重要的業務邏輯撰寫單元測試
-- **程式碼品質**：使用 Checkstyle、PMD 等工具確保程式碼品質
+## HTTP Status Codes
 
-### 🚀 開發建議
+### Common Status Codes
 
-1. **使用台灣常用的專業用語**，確保溝通順暢且符合本地習慣
-2. **遵循 RESTful API 設計原則**，提供直觀的 API 介面
-3. **實作適當的資料驗證**，確保資料的完整性與正確性
-4. **考慮向後相容性**，避免破壞性的 API 變更
+| Code | Status | Usage | This Project |
+|------|--------|-------|-------------|
+| 200 | OK | Successful GET | `getAll()`, `getById()`, `getByName()`, `getOrder()` |
+| 201 | Created | Successful POST | `create()` with @ResponseStatus(CREATED) |
+| 204 | No Content | Successful DELETE | - |
+| 400 | Bad Request | Invalid request body | Missing required fields |
+| 404 | Not Found | Resource not found | Coffee or Order not exists |
+| 406 | Not Acceptable | Accept header mismatch | Accept: application/xml |
+| 415 | Unsupported Media Type | Content-Type mismatch | Content-Type: application/pdf |
 
-## 授權說明
+### Set Response Status
 
-本專案採用 MIT 授權條款，詳見 LICENSE 檔案。
+```java
+// Automatic 200 OK
+@GetMapping("/order/{id}")
+public Order getOrder(@PathVariable Long id) { }
 
-## 關於我們
+// Explicit 201 CREATED
+@PostMapping("/order/")
+@ResponseStatus(HttpStatus.CREATED)
+public Order create(@RequestBody NewOrderRequest request) { }
 
-我們主要專注在敏捷專案管理、物聯網（IoT）應用開發和領域驅動設計（DDD）。喜歡把先進技術和實務經驗結合，打造好用又靈活的軟體解決方案。
+// 204 NO_CONTENT (for delete)
+@DeleteMapping("/order/{id}")
+@ResponseStatus(HttpStatus.NO_CONTENT)
+public void delete(@PathVariable Long id) { }
+```
 
-## 聯繫我們
+## Testing
 
-- **FB 粉絲頁**：[風清雲談 | Facebook](https://www.facebook.com/profile.php?id=61576838896062)
-- **LinkedIn**：[linkedin.com/in/chu-kuo-lung](https://www.linkedin.com/in/chu-kuo-lung)
-- **YouTube 頻道**：[雲談風清 - YouTube](https://www.youtube.com/channel/UCXDqLTdCMiCJ1j8xGRfwEig)
-- **風清雲談 部落格**：[風清雲談](https://blog.fengqing.tw/)
-- **電子郵件**：[fengqing.tw@gmail.com](mailto:fengqing.tw@gmail.com)
+### cURL Examples
+
+**1. Get All Coffees:**
+
+```bash
+curl -v http://localhost:8080/coffee/
+```
+
+**2. Get Coffee by ID:**
+
+```bash
+curl -v http://localhost:8080/coffee/1
+```
+
+**3. Get Coffee by Name:**
+
+```bash
+curl -v "http://localhost:8080/coffee/?name=mocha"
+```
+
+**4. Get Order:**
+
+```bash
+curl -v http://localhost:8080/order/1
+```
+
+**5. Create Order (Success):**
+
+```bash
+curl -v -X POST http://localhost:8080/order/ \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{
+    "customer": "Ray Chu",
+    "items": ["mocha", "latte"]
+  }'
+
+# Response: 201 CREATED
+```
+
+**6. Create Order (Error - Wrong Content-Type):**
+
+```bash
+curl -v -X POST http://localhost:8080/order/ \
+  -H "Content-Type: application/pdf" \
+  -H "Accept: application/json" \
+  -d '{
+    "customer": "Ray Chu",
+    "items": ["mocha"]
+  }'
+
+# Response: 415 Unsupported Media Type
+```
+
+**7. Create Order (Error - Wrong Accept):**
+
+```bash
+curl -v -X POST http://localhost:8080/order/ \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/xml" \
+  -d '{
+    "customer": "Ray Chu",
+    "items": ["mocha"]
+  }'
+
+# Response: 406 Not Acceptable
+```
+
+### Postman Examples
+
+**Create Order:**
+
+- **Method**: POST
+- **URL**: `http://localhost:8080/order/`
+- **Headers**:
+  - `Content-Type`: `application/json`
+  - `Accept`: `application/json`
+- **Body** (raw JSON):
+  ```json
+  {
+    "customer": "Ray Chu",
+    "items": ["mocha", "latte"]
+  }
+  ```
+
+## @Controller vs @RestController
+
+### @Controller
+
+```java
+@Controller
+@RequestMapping("/coffee")
+public class CoffeeController {
+    
+    @GetMapping("/")
+    @ResponseBody  // Required for JSON response
+    public List<Coffee> getAll() {
+        return coffeeService.getAllCoffee();
+    }
+}
+```
+
+**Characteristics:**
+- Traditional MVC controller
+- Needs `@ResponseBody` for each JSON method
+- Can return view names (for template engines)
+
+### @RestController
+
+```java
+@RestController
+@RequestMapping("/order")
+public class OrderController {
+    
+    @GetMapping("/{id}")
+    // No @ResponseBody needed!
+    public Order getOrder(@PathVariable Long id) {
+        return orderService.get(id);
+    }
+}
+```
+
+**Characteristics:**
+- `@Controller` + `@ResponseBody` combined
+- Automatic JSON response for all methods
+- Best for RESTful APIs
+
+**Selection Guide:**
+- **@Controller**: For traditional MVC (returning views)
+- **@RestController**: For RESTful APIs (returning JSON/XML)
+
+## Best Practices
+
+### 1. Use HTTP Method Shortcuts
+
+```java
+// ✅ Recommended: Use shortcuts
+@GetMapping("/orders")
+@PostMapping("/orders")
+@PutMapping("/orders/{id}")
+@DeleteMapping("/orders/{id}")
+
+// ❌ Not recommended: Verbose @RequestMapping
+@RequestMapping(path = "/orders", method = RequestMethod.GET)
+@RequestMapping(path = "/orders", method = RequestMethod.POST)
+```
+
+### 2. Explicit Path Variable Names
+
+```java
+// ✅ Recommended: Explicit name
+@GetMapping("/orders/{orderId}")
+public Order get(@PathVariable("orderId") Long orderId) { }
+
+// ⚠️ Acceptable: Same name
+@GetMapping("/orders/{id}")
+public Order get(@PathVariable Long id) { }  // Variable name = path name
+```
+
+### 3. RequestParam with Defaults
+
+```java
+// ✅ Recommended: Set defaults and required
+@GetMapping("/orders")
+public List<Order> getOrders(
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "10") int size,
+    @RequestParam(required = false) String status) {
+    // Implementation
+}
+```
+
+### 4. Specify Media Types
+
+```java
+// ✅ Recommended: Explicit media types
+@PostMapping(path = "/orders",
+             consumes = MediaType.APPLICATION_JSON_VALUE,
+             produces = MediaType.APPLICATION_JSON_VALUE)
+public Order create(@RequestBody OrderRequest request) { }
+
+// ⚠️ Acceptable: Default (any media type)
+@PostMapping("/orders")
+public Order create(@RequestBody OrderRequest request) { }
+```
+
+### 5. Set Proper HTTP Status
+
+```java
+// ✅ Recommended: Explicit status codes
+@PostMapping("/orders")
+@ResponseStatus(HttpStatus.CREATED)  // 201
+public Order create(@RequestBody OrderRequest request) { }
+
+@DeleteMapping("/orders/{id}")
+@ResponseStatus(HttpStatus.NO_CONTENT)  // 204
+public void delete(@PathVariable Long id) { }
+
+@PutMapping("/orders/{id}")
+@ResponseStatus(HttpStatus.OK)  // 200 (default)
+public Order update(@PathVariable Long id, @RequestBody OrderRequest request) { }
+```
+
+### 6. Request Validation
+
+```java
+// Add Jakarta Bean Validation
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+
+@PostMapping("/orders")
+@ResponseStatus(HttpStatus.CREATED)
+public Order create(@Valid @RequestBody NewOrderRequest request) { }
+
+// NewOrderRequest with validation
+public class NewOrderRequest {
+    @NotBlank(message = "Customer name is required")
+    private String customer;
+    
+    @NotEmpty(message = "Items list cannot be empty")
+    private List<String> items;
+}
+```
+
+## Common Issues
+
+### Issue 1: 415 Unsupported Media Type
+
+**Error:**
+
+```json
+{
+  "timestamp": "2025-10-16T16:52:02.000+00:00",
+  "status": 415,
+  "error": "Unsupported Media Type",
+  "message": "Content-Type 'application/pdf' is not supported"
+}
+```
+
+**Cause:** Request Content-Type doesn't match `consumes` attribute
+
+**Solution:**
+
+```bash
+# Ensure Content-Type is application/json
+curl -X POST http://localhost:8080/order/ \
+  -H "Content-Type: application/json" \
+  -d '{"customer": "Ray", "items": ["mocha"]}'
+```
+
+### Issue 2: 406 Not Acceptable
+
+**Error:**
+
+```json
+{
+  "timestamp": "2025-10-16T16:52:02.000+00:00",
+  "status": 406,
+  "error": "Not Acceptable",
+  "message": "Could not find acceptable representation"
+}
+```
+
+**Cause:** Request Accept header doesn't match `produces` attribute
+
+**Solution:**
+
+```bash
+# Ensure Accept is application/json or omit it
+curl -X POST http://localhost:8080/order/ \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{"customer": "Ray", "items": ["mocha"]}'
+```
+
+### Issue 3: 400 Bad Request
+
+**Error:**
+
+```json
+{
+  "timestamp": "2025-10-16T16:52:02.000+00:00",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Required request body is missing"
+}
+```
+
+**Cause:** Missing request body for `@RequestBody`
+
+**Solution:**
+
+```bash
+# Include request body
+curl -X POST http://localhost:8080/order/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customer": "Ray Chu",
+    "items": ["mocha"]
+  }'
+```
+
+### Issue 4: Params Condition Not Matching
+
+**Problem:** Wrong method is called
+
+**Example:**
+
+```bash
+# Want: getAll() - all coffees
+curl http://localhost:8080/coffee/
+
+# Get: Error if name param exists
+curl "http://localhost:8080/coffee/?name=mocha"
+```
+
+**Solution:** Check `params` attribute matches request
+
+```java
+// No name param → getAll()
+@GetMapping(path = "/", params = "!name")
+
+// Has name param → getByName()
+@GetMapping(path = "/", params = "name")
+```
+
+## Database Schema
+
+**schema.sql:**
+
+```sql
+drop table t_coffee if exists;
+drop table t_order if exists;
+drop table t_order_coffee if exists;
+
+create table t_coffee (
+    id bigint auto_increment,
+    create_time timestamp,
+    update_time timestamp,
+    name varchar(255),
+    price bigint,
+    primary key (id)
+);
+
+create table t_order (
+    id bigint auto_increment,
+    create_time timestamp,
+    update_time timestamp,
+    customer varchar(255),
+    state integer not null,
+    primary key (id)
+);
+
+create table t_order_coffee (
+    coffee_order_id bigint not null,
+    items_id bigint not null
+);
+
+insert into t_coffee (name, price, create_time, update_time) 
+    values ('espresso', 10000, now(), now());
+insert into t_coffee (name, price, create_time, update_time) 
+    values ('latte', 12500, now(), now());
+insert into t_coffee (name, price, create_time, update_time) 
+    values ('capuccino', 12500, now(), now());
+insert into t_coffee (name, price, create_time, update_time) 
+    values ('mocha', 15000, now(), now());
+insert into t_coffee (name, price, create_time, update_time) 
+    values ('macchiato', 15000, now(), now());
+```
+
+## RESTful API Design
+
+### Best Practices
+
+**1. Use Proper HTTP Methods:**
+
+```java
+// ✅ Recommended
+GET    /orders        // List all orders
+GET    /orders/{id}   // Get specific order
+POST   /orders        // Create new order
+PUT    /orders/{id}   // Update entire order
+PATCH  /orders/{id}   // Update partial order
+DELETE /orders/{id}   // Delete order
+```
+
+**2. Use Plural Nouns:**
+
+```java
+// ✅ Recommended
+/orders
+/coffees
+
+// ❌ Not recommended
+/order
+/coffee
+```
+
+**3. Use Nested Resources:**
+
+```java
+// ✅ Recommended
+GET /orders/{orderId}/items        // Get order items
+POST /orders/{orderId}/items       // Add item to order
+
+// ❌ Not recommended
+GET /order-items?orderId=1
+```
+
+**4. Use Query Parameters for Filtering:**
+
+```java
+// ✅ Recommended
+GET /orders?status=PAID&customer=Ray
+
+// Implementation
+@GetMapping("/orders")
+public List<Order> getOrders(
+    @RequestParam(required = false) String status,
+    @RequestParam(required = false) String customer) {
+    // Filter logic
+}
+```
+
+**5. Return Appropriate Status Codes:**
+
+```java
+// ✅ Recommended
+@PostMapping("/orders")
+@ResponseStatus(HttpStatus.CREATED)  // 201
+public Order create() { }
+
+@DeleteMapping("/orders/{id}")
+@ResponseStatus(HttpStatus.NO_CONTENT)  // 204
+public void delete() { }
+```
+
+## Best Practices Demonstrated
+
+1. **@RequestMapping Attributes**: path, method, params, consumes, produces
+2. **HTTP Method Shortcuts**: @GetMapping, @PostMapping
+3. **Parameter Handling**: @PathVariable, @RequestParam, @RequestBody
+4. **Response Configuration**: @ResponseBody, @ResponseStatus
+5. **Params Condition**: Dynamic routing based on query parameters
+6. **Media Type Control**: Restrict request/response formats
+7. **RESTful API Design**: Standard HTTP methods and status codes
+
+## References
+
+- [Spring MVC Documentation](https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc)
+- [Spring Boot Web Documentation](https://docs.spring.io/spring-boot/docs/current/reference/html/web.html)
+- [RESTful API Design Best Practices](https://restfulapi.net/)
+- [HTTP Status Codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## About Us
+
+我們主要專注在敏捷專案管理、物聯網（IoT）應用開發和領域驅動設計（DDD）。喜歡把先進技術和實務經驗結合，打造好用又靈活的軟體解決方案。近來也積極結合 AI 技術，推動自動化工作流，讓開發與運維更有效率、更智慧。持續學習與分享，希望能一起推動軟體開發的創新和進步。
+
+## Contact
+
+**風清雲談** - 專注於敏捷專案管理、物聯網（IoT）應用開發和領域驅動設計（DDD）。
+
+- 🌐 官方網站：[風清雲談部落格](https://blog.fengqing.tw/)
+- 📘 Facebook：[風清雲談粉絲頁](https://www.facebook.com/profile.php?id=61576838896062)
+- 💼 LinkedIn：[Chu Kuo-Lung](https://www.linkedin.com/in/chu-kuo-lung)
+- 📺 YouTube：[雲談風清頻道](https://www.youtube.com/channel/UCXDqLTdCMiCJ1j8xGRfwEig)
+- 📧 Email：[fengqing.tw@gmail.com](mailto:fengqing.tw@gmail.com)
 
 ---
 
-**📅 最後更新：2025-07-10**  
-**👨‍💻 維護者：風清雲談團隊** 
+**⭐ 如果這個專案對您有幫助，歡迎給個 Star！**
